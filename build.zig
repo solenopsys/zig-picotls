@@ -27,8 +27,8 @@ fn buildForTarget(
     const picotls_c = buildPicotlsC(b, target, optimize, target_str);
 
     lib.root_module.addIncludePath(b.path("vendor/picotls/include"));
-    lib.addObjectFile(picotls_c.getEmittedBin());
-    lib.linkLibC();
+    lib.root_module.addObjectFile(picotls_c.getEmittedBin());
+    lib.root_module.link_libc = true;
 
     const install = b.addInstallArtifact(lib, .{});
 
@@ -76,7 +76,7 @@ fn buildPicotlsC(
     };
 
     // picotls core sources
-    picotls_c.addCSourceFiles(.{
+    picotls_c.root_module.addCSourceFiles(.{
         .root = b.path("vendor/picotls"),
         .files = &.{
             "lib/picotls.c",
@@ -94,7 +94,7 @@ fn buildPicotlsC(
     });
 
     // cifra sources
-    picotls_c.addCSourceFiles(.{
+    picotls_c.root_module.addCSourceFiles(.{
         .root = b.path("vendor/picotls/deps/cifra/src"),
         .files = &.{
             "aes.c",
@@ -117,7 +117,7 @@ fn buildPicotlsC(
     });
 
     // micro-ecc sources
-    picotls_c.addCSourceFiles(.{
+    picotls_c.root_module.addCSourceFiles(.{
         .root = b.path("vendor/picotls/deps/micro-ecc"),
         .files = &.{
             "uECC.c",
@@ -125,11 +125,11 @@ fn buildPicotlsC(
         .flags = &base_flags,
     });
 
-    picotls_c.addIncludePath(b.path("vendor/picotls/include"));
-    picotls_c.addIncludePath(b.path("vendor/picotls/deps/cifra/src"));
-    picotls_c.addIncludePath(b.path("vendor/picotls/deps/cifra/src/ext"));
-    picotls_c.addIncludePath(b.path("vendor/picotls/deps/micro-ecc"));
-    picotls_c.linkLibC();
+    picotls_c.root_module.addIncludePath(b.path("vendor/picotls/include"));
+    picotls_c.root_module.addIncludePath(b.path("vendor/picotls/deps/cifra/src"));
+    picotls_c.root_module.addIncludePath(b.path("vendor/picotls/deps/cifra/src/ext"));
+    picotls_c.root_module.addIncludePath(b.path("vendor/picotls/deps/micro-ecc"));
+    picotls_c.root_module.link_libc = true;
 
     return picotls_c;
 }
@@ -170,8 +170,8 @@ pub fn build(b: *std.Build) void {
         });
 
         lib.root_module.addIncludePath(b.path("vendor/picotls/include"));
-        lib.addObjectFile(picotls_c.getEmittedBin());
-        lib.linkLibC();
+        lib.root_module.addObjectFile(picotls_c.getEmittedBin());
+        lib.root_module.link_libc = true;
 
         b.installArtifact(lib);
     }
